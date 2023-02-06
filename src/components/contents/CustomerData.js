@@ -1,122 +1,103 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
-import useSWR from "swr";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ContentTitle from "../mini/ContentTitle";
-import AddModal from "../mini/AddModal";
-import EditModal from "../mini/EditModal";
-import TimingAlert from "../mini/TimingAlert";
-import DialogBox from "../mini/DialogBox";
 import CircularProgress from "@mui/material/CircularProgress";
+import { StyledTableCell, StyledTableRow } from "./utils/general-utils";
 
-import {
-  fetcher,
-  StyledTableCell,
-  StyledTableRow,
-} from "./utils/general-utils";
-
+import Button from "@mui/material/Button";
+import * as XLSX from "xlsx";
+import DatePickerCustom from "../mini/DatePickerCustom";
+import PaginationIcons from "../mini/PaginationIcons";
+import SearchInput from "../mini/SearchInput";
 export default function ContentTable() {
-  const tab = useSelector((state) => state.tab.tab);
-  // const btn = useSelector((state) => state.btn.btn);
-  // const insuranceOrLife = btn == 0 ? "insurance" : "life";
-  const category =
-    tab == "Customer Data"
-      ? "teams"
-      : tab == "Bill Payment User"
-      ? "directors"
-      : tab == "Transacted Order Succeeded"
-      ? "news"
-      : "events";
+  // expoted date => data is paginated, so data.meta isn't null
+  //paginated date => data is not,instead, served fully, so data.meta is null
+  const [page, setPage] = React.useState(1);
+  const [enabled, setEnabled] = React.useState(true);
+  const [dateFrom, setDateFrom] = React.useState(null);
+  const [dateTo, setDateTo] = React.useState(null);
+  const [paginatedData, setPaginatedData] = React.useState([]);
+  const [searchText, setSearchText] = React.useState("");
+  // handle api query based on date
+  const url =
+    dateFrom && dateTo
+      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}&to=${dateTo}`
+      : dateFrom
+      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}`
+      : dateTo
+      ? `https://api-mobile.contact.eg/report/users/new?to=${dateTo}`
+      : `https://api-mobile.contact.eg/report/users/new`;
+  const handleCloseAgree = () => {};
 
-  const [openAdd, setOpenAdd] = React.useState(false);
+  React.useEffect(() => {
+    fetch(`${url}`)
+      .then((response) => response.json())
+      .then((response) => setPaginatedData(response));
+  }, []);
+  const downloadExcel = async () => {
+    setEnabled(false);
+    const exportedData = await fetch(`${url}`).then((response) =>
+      response.json()
+    );
+    // const worksheet = XLSX.utils.json_to_sheet([exportedData.data]);
+    const worksheet = XLSX.utils.json_to_sheet([exportedData]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-  const [openEdit, setOpenEdit] = React.useState(false);
-
-  const [alert, setAlert] = React.useState(false);
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [currentId, setCurrentId] = React.useState();
-
-  const handleCloseAgree = () => {
-    // setOpenDialog(false);
-    // setAlert(true);
-    // fetch(`http://localhost:3000/api/sarwa/${insuranceOrLife}/${category}`, {
-    //   method: "DELETE",
-    //   body: JSON.stringify({
-    //     _id: currentId,
-    //   }),
-    // });
-    // setTimeout(() => {
-    //   setAlert(false);
-    // }, 2000);
+    XLSX.writeFile(workbook, "DataSheet.xlsx");
+    setEnabled(true);
   };
-
-  // const { data, error, isLoading } = useSWR(
-  //   `/api/sarwa/${insuranceOrLife}/${category}`,
-  //   fetcher,
-  //   {
-  //     refreshInterval: 100,
-  //   }
-  // );
 
   return (
     <Box>
-      <DialogBox
-        openDialog={openDialog}
-        handleCloseAgree={handleCloseAgree}
-        handleCloseDisagree={() => {
-          setOpenDialog(false);
-        }}
-        setAlert={setAlert}
-      ></DialogBox>
-      <AddModal
-        openAdd={openAdd}
-        setOpenAdd={setOpenAdd}
-        endPoint="teams"
-      ></AddModal>
-      <EditModal
-        openEdit={openEdit}
-        setOpenEdit={setOpenEdit}
-        endPoint="teams"
-        currentId={currentId}
-      ></EditModal>
-
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          // m: 1
+          alignItems: "flex-start",
         }}
       >
-        <ContentTitle></ContentTitle>
-        {alert && <TimingAlert></TimingAlert>}
+        <ContentTitle />
+        <DatePickerCustom
+          dateFrom={dateFrom}
+          setDateFrom={setDateFrom}
+          dateTo={dateTo}
+          setDateTo={setDateTo}
+        />
+        <SearchInput searchText={searchText} setSearchText={setSearchText} />
+        <PaginationIcons
+          page={page}
+          setPage={setPage}
+          paginatedData={paginatedData}
+        ></PaginationIcons>
+
+        <Button
+          variant="contained"
+          sx={{ fontWeight: "bold", height: "35px" }}
+          onClick={downloadExcel}
+        >
+          {enabled ? (
+            "Export"
+          ) : (
+            <CircularProgress size={20} sx={{ color: "white" }} />
+          )}
+        </Button>
       </Box>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+        <Table
+          sx={{ minWidth: 700 }}
+          aria-label="customized table"
+          // stickyHeader
+        >
           <TableHead>
             <TableRow>
-              <StyledTableCell sx={{ width: 150 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    // wordSpacing: "200px",
-                  }}
-                >
-                  Total Accumulated Base
-                </Box>
-              </StyledTableCell>
               <StyledTableCell sx={{ width: 250 }}>
                 <Box
                   sx={{
@@ -126,89 +107,9 @@ export default function ContentTable() {
                     // wordSpacing: "200px",
                   }}
                 >
-                  Newly acquired customers over the App
+                  New Users
                 </Box>
               </StyledTableCell>
-              {/* <StyledTableCell sx={{ width: 250 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    wordSpacing: "200px",
-                  }}
-                >
-                  Name (ar)
-                </Box>
-              </StyledTableCell>
-              <StyledTableCell sx={{ width: 250 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    wordSpacing: "200px",
-                  }}
-                >
-                  Position (en)
-                </Box>
-              </StyledTableCell>
-              <StyledTableCell sx={{ width: 250 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    wordSpacing: "200px",
-                  }}
-                >
-                  Position (ar)
-                </Box>
-              </StyledTableCell>
-              <StyledTableCell sx={{ width: 400 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    wordSpacing: "400px",
-                  }}
-                >
-                  Image URL
-                </Box>
-              </StyledTableCell> */}
-              {/* <StyledTableCell sx={{ width: 250 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    wordSpacing: "200px",
-                  }}
-                >
-                  Control
-                </Box>
-              </StyledTableCell>
-              <StyledTableCell sx={{ width: 10 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    "& .MuiButtonBase-root": {
-                      color: "white",
-                    },
-                  }}
-                >
-                  <IconButton sx={{ borderRadius: "50%", p: "8px" }}>
-                    <AddCircleIcon
-                      sx={{ fontSize: 40, color: "#27A4FF" }}
-                      onClick={() => {
-                        setOpenAdd(true);
-                      }}
-                    ></AddCircleIcon>
-                  </IconButton>
-                </Box>
-              </StyledTableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -230,53 +131,13 @@ export default function ContentTable() {
             ) : // ) : data.length ? (
             true ? (
               // data.map((member, index) => (
-              <StyledTableRow key={""}>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {"323081"}
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {"18229"}
-                </StyledTableCell>
-                {/* <StyledTableCell component="th" scope="row" align="center">
-                  {"member.name.ar"}
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  {"member.position.en"}
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  {"member.position.ar"}
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  {"member.imgUrl"}
-                </StyledTableCell> */}
-                {/* <StyledTableCell>
-                  <Box
-                    sx={{ display: "flex", gap: 1, justifyContent: "center" }}
-                  >
-                    <Button
-                      color="success"
-                      variant="outlined"
-                      onClick={() => {
-                        setOpenEdit(true);
-                        setCurrentId(member._id);
-                      }}
-                    >
-                      <EditIcon></EditIcon>
-                    </Button>
-                    <Button
-                      color="error"
-                      variant="outlined"
-                      onClick={() => {
-                        setOpenDialog(true);
-                        setCurrentId(member._id);
-                      }}
-                    >
-                      <DeleteIcon></DeleteIcon>
-                    </Button>
-                  </Box>
-                </StyledTableCell>
-                <StyledTableCell></StyledTableCell> */}
-              </StyledTableRow>
+              <>
+                <StyledTableRow key={""}>
+                  <StyledTableCell component="th" scope="row" align="center">
+                    {paginatedData.new_users}
+                  </StyledTableCell>
+                </StyledTableRow>
+              </>
             ) : (
               // ))
               <StyledTableRow sx={{}}>

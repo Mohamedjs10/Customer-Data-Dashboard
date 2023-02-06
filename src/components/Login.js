@@ -33,6 +33,7 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function Login({ setauthenticated }) {
+  const [isChecked, setIsChecked] = useState(false);
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState(false);
   const [password, setPassword] = useState("");
@@ -56,12 +57,18 @@ export default function Login({ setauthenticated }) {
     if (isCredentialExist({ username, password })) {
       setUsernameError(false);
       setPasswordError(false);
-      console.log("authenticated");
+      // console.log("authenticated");
       setauthenticated(true);
     } else if (!isCredentialExist({ username, password })) {
       setUsernameError(true);
       setPasswordError(true);
-      console.log("not authenticated: wrong username or password");
+      // console.log("not authenticated: wrong username or password");
+    }
+    if (isChecked && isCredentialExist({ username, password })) {
+      localStorage.setItem("username", username);
+      localStorage.setItem("password", password);
+      console.log(localStorage.getItem("username"));
+      console.log(localStorage.getItem("password"));
     }
   };
 
@@ -136,6 +143,10 @@ export default function Login({ setauthenticated }) {
             <FormControlLabel
               control={
                 <Checkbox
+                  checked={isChecked}
+                  onChange={() => {
+                    setIsChecked((prev) => !prev);
+                  }}
                   value="remember"
                   sx={{
                     "&": { color: "#282780" },

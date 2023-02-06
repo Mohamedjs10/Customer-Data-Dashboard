@@ -36,3 +36,9 @@ export const style = {
   p: 4,
   borderRadius: "10px",
 };
+
+export function pad(num) {
+  num = num.toString();
+  if (num.length < 2) num = "0" + num;
+  return num;
+}

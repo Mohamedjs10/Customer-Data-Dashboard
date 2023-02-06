@@ -3,8 +3,7 @@ import { useSelector } from "react-redux";
 import Box from "@mui/material/Box";
 function ContentTitle() {
   const tab = useSelector((state) => state.tab.tab);
-  // const btn = useSelector((state) => state.btn.btn);
-  // const title = btn == 0 ? "Sarwa Insurance" : "Sarwa Life";
+
   return (
     <Box
       sx={{
@@ -16,10 +15,7 @@ function ContentTitle() {
         color: "black",
       }}
     >
-      <Box>
-        {/* {title} : {tab} */}
-        {tab}
-      </Box>
+      <Box>{tab}</Box>
     </Box>
   );
 }
