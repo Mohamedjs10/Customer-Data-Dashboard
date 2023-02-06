@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import ContentTitle from "../mini/ContentTitle";
 import CircularProgress from "@mui/material/CircularProgress";
 import { StyledTableCell, StyledTableRow } from "./utils/general-utils";
-
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Button from "@mui/material/Button";
 import * as XLSX from "xlsx";
 import DatePickerCustom from "../mini/DatePickerCustom";
@@ -131,20 +131,27 @@ export default function ContentTable() {
                     <StyledTableCell component="th" scope="row" align="center">
                       {item.location[0] && (
                         <>
-                          <Box sx={{ textAlign: "left" }}>
-                            latitude: {item.location[0]?.latitude}
-                          </Box>
-                          <Box sx={{ textAlign: "left" }}>
-                            longitude: {item.location[0]?.longitude}
-                          </Box>
-                          <Box sx={{ textAlign: "left" }}>
-                            time: {item.location[0]?.time}
+                          <Box>
+                            <a
+                              target="_blank"
+                              href={`https://maps.google.com/?q=${
+                                item.location[item.location.length - 1]
+                                  ?.latitude
+                              },${
+                                item.location[item.location.length - 1]
+                                  ?.longitude
+                              }`}
+                            >
+                              <LocationOnIcon
+                                sx={{ fontSize: 30, color: "red" }}
+                              />
+                            </a>
                           </Box>
                         </>
                       )}
                     </StyledTableCell>
                     <StyledTableCell component="th" scope="row" align="center">
-                      {item.created_at}
+                      {new Date(item.created_at).toLocaleString()}
                     </StyledTableCell>
                     <StyledTableCell component="th" scope="row" align="center">
                       {item.device_model}

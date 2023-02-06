@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 export default function SearchInput({ searchText, setSearchText }) {
   return (
     <Box sx={{ ml: 10 }}>
-      <Paper
+      {/* <Paper
         component="form"
         sx={{
           p: "2px 4px",
@@ -39,7 +39,7 @@ export default function SearchInput({ searchText, setSearchText }) {
         >
           <SearchIcon />
         </IconButton>
-      </Paper>
+      </Paper> */}
     </Box>
   );
 }
