@@ -1,8 +1,11 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
+import dayjs from "dayjs";
+
+// import { billPaymentReport } from "./encryption/apiCalls";
 import Login from "./components/Login";
 import Paperbase from "./components/Paperbase";
 import Box from "@mui/material/Box";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
 export default function Home() {
   const [authenticated, setauthenticated] = useState(false);
@@ -11,8 +14,13 @@ export default function Home() {
       setauthenticated(true);
     }
   }, []);
-  const tab = useSelector((state) => state.tab.tab);
-  console.log(tab);
+  // const tab = useSelector((state) => state.tab.tab);
+  // console.log(tab);
+  // useEffect(() => {
+  //   billPaymentReport().then((res) => {
+  //     console.log(res);
+  //   });
+  // });
   return (
     <>
       {!authenticated ? (

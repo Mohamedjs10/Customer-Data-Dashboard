@@ -1,10 +1,11 @@
 import * as React from "react";
-import { useSelector } from "react-redux";
+import TableHeader from "../mini/TableHeader";
+import TableBodyy from "../mini/TableBodyy";
+
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import ContentTitle from "../mini/ContentTitle";
@@ -16,6 +17,7 @@ import * as XLSX from "xlsx";
 import DatePickerCustom from "../mini/DatePickerCustom";
 import PaginationIcons from "../mini/PaginationIcons";
 import SearchInput from "../mini/SearchInput";
+
 export default function ContentTable() {
   // expoted date => data is paginated, so data.meta isn't null
   //paginated date => data is not,instead, served fully, so data.meta is null
@@ -23,7 +25,10 @@ export default function ContentTable() {
   const [enabled, setEnabled] = React.useState(true);
   const [dateFrom, setDateFrom] = React.useState(null);
   const [dateTo, setDateTo] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const [paginatedData, setPaginatedData] = React.useState([]);
+  console.log([paginatedData]);
   const [searchText, setSearchText] = React.useState("");
   // handle api query based on date
   const url =
@@ -34,19 +39,24 @@ export default function ContentTable() {
       : dateTo
       ? `https://api-mobile.contact.eg/report/users/new?to=${dateTo}`
       : `https://api-mobile.contact.eg/report/users/new`;
-  const handleCloseAgree = () => {};
 
   React.useEffect(() => {
+    setIsLoading(true);
     fetch(`${url}`)
       .then((response) => response.json())
-      .then((response) => setPaginatedData(response));
-  }, []);
+      .then((response) => {
+        setPaginatedData(response);
+        setIsLoading(false);
+      });
+  }, [page, dateFrom, dateTo]);
+
   const downloadExcel = async () => {
     setEnabled(false);
     const exportedData = await fetch(`${url}`).then((response) =>
       response.json()
     );
-    // const worksheet = XLSX.utils.json_to_sheet([exportedData.data]);
+
+    //!TODO const worksheet = XLSX.utils.json_to_sheet([exportedData.data]);
     const worksheet = XLSX.utils.json_to_sheet([exportedData]);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -91,30 +101,10 @@ export default function ContentTable() {
         </Button>
       </Box>
       <TableContainer component={Paper}>
-        <Table
-          sx={{ minWidth: 700 }}
-          aria-label="customized table"
-          // stickyHeader
-        >
-          <TableHead>
-            <TableRow>
-              <StyledTableCell sx={{ width: 250 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    // wordSpacing: "200px",
-                  }}
-                >
-                  New Users
-                </Box>
-              </StyledTableCell>
-            </TableRow>
-          </TableHead>
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+          <TableHeader cells={["New Users"]} />
           <TableBody>
-            {/* {isLoading ? ( */}
-            {false ? (
+            {isLoading ? (
               <StyledTableRow>
                 <StyledTableCell component="th" scope="row" colSpan={8}>
                   <Box
@@ -128,15 +118,12 @@ export default function ContentTable() {
                   </Box>
                 </StyledTableCell>
               </StyledTableRow>
-            ) : // ) : data.length ? (
-            true ? (
-              // data.map((member, index) => (
+            ) : paginatedData ? (
               <>
-                <StyledTableRow key={""}>
-                  <StyledTableCell component="th" scope="row" align="center">
-                    {paginatedData.new_users}
-                  </StyledTableCell>
-                </StyledTableRow>
+                {/*TODO {paginatedData?.map((item, index) => (       .....    the only one come back with object instead of array*/}
+                {[paginatedData]?.map((item, index) => (
+                  <TableBodyy item={item} index={index} />
+                ))}
               </>
             ) : (
               // ))

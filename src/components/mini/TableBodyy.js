@@ -106,8 +106,42 @@ export default function TableBodyy({ item, index }) {
       </>
     );
   } else if (tab === "Bill Payment User") {
-    return <></>;
+    return (
+      <>
+        <StyledTableRow key={index}>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.client_phone_number}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {new Date(item.created_at).toLocaleString()}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.o_status}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.o_total_amount}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.order_id}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.service_name}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.transaction_id}
+          </StyledTableCell>
+        </StyledTableRow>
+      </>
+    );
   } else if (tab === "Customer Data") {
-    return <></>;
+    return (
+      <>
+        <StyledTableRow key={index}>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.new_users}
+          </StyledTableCell>
+        </StyledTableRow>
+      </>
+    );
   } else return <></>;
 }
