@@ -1,162 +1,104 @@
 import * as React from "react";
-import { useSelector } from "react-redux";
-import useSWR from "swr";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ContentTitle from "../mini/ContentTitle";
-import AddModal from "../mini/AddModal";
-import EditModal from "../mini/EditModal";
-import TimingAlert from "../mini/TimingAlert";
-import DialogBox from "../mini/DialogBox";
 import CircularProgress from "@mui/material/CircularProgress";
-
-import {
-  fetcher,
-  StyledTableCell,
-  StyledTableRow,
-} from "./utils/general-utils";
-
+import { StyledTableCell, StyledTableRow } from "./utils/general-utils";
+import Button from "@mui/material/Button";
+import * as XLSX from "xlsx";
+import DatePickerCustom from "../mini/DatePickerCustom";
+import PaginationIcons from "../mini/PaginationIcons";
+import SearchInput from "../mini/SearchInput";
+import TableHeader from "../mini/TableHeader";
+import TableBodyy from "../mini/TableBodyy";
 export default function ContentTable() {
-  const tab = useSelector((state) => state.tab.tab);
-  // const btn = useSelector((state) => state.btn.btn);
-  // const insuranceOrLife = btn == 0 ? "insurance" : "life";
-  const category =
-    tab == "Customer Data"
-      ? "teams"
-      : tab == "Bill Payment User"
-      ? "directors"
-      : tab == "Transacted Order Succeeded"
-      ? "news"
-      : "events";
+  // expoted date => data is paginated, so data.meta isn't null
+  //paginated date => data is not,instead, served fully, so data.meta is null
+  const [page, setPage] = React.useState(1);
+  const [enabled, setEnabled] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [dateFrom, setDateFrom] = React.useState(null);
+  const [dateTo, setDateTo] = React.useState(null);
+  const [paginatedData, setPaginatedData] = React.useState([]);
+  console.log(paginatedData);
+  const [searchText, setSearchText] = React.useState("");
+  // handle api query based on date
+  const url =
+    dateFrom && dateTo
+      ? `https://api-mobile.contact.eg/report/instant-approval?from=${dateFrom}&to=${dateTo}&`
+      : dateFrom
+      ? `https://api-mobile.contact.eg/report/instant-approval?from=${dateFrom}&`
+      : dateTo
+      ? `https://api-mobile.contact.eg/report/instant-approval?to=${dateTo}&`
+      : `https://api-mobile.contact.eg/report/instant-approval?`;
 
-  const [openAdd, setOpenAdd] = React.useState(false);
+  React.useEffect(() => {
+    setIsLoading(true);
+    fetch(`${url}page=${page}&take=100`)
+      .then((response) => response.json())
+      .then((response) => {
+        setPaginatedData(response);
+        setIsLoading(false);
+      });
+  }, [page, dateFrom, dateTo]);
+  const downloadExcel = async () => {
+    setEnabled(false);
+    const exportedData = await fetch(`${url}export_=true`).then((response) =>
+      response.json()
+    );
+    const worksheet = XLSX.utils.json_to_sheet(exportedData.data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-  const [openEdit, setOpenEdit] = React.useState(false);
-
-  const [alert, setAlert] = React.useState(false);
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [currentId, setCurrentId] = React.useState();
-
-  const handleCloseAgree = () => {
-    // setOpenDialog(false);
-    // setAlert(true);
-    // fetch(`http://localhost:3000/api/sarwa/${insuranceOrLife}/${category}`, {
-    //   method: "DELETE",
-    //   body: JSON.stringify({
-    //     _id: currentId,
-    //   }),
-    // });
-    // setTimeout(() => {
-    //   setAlert(false);
-    // }, 2000);
+    XLSX.writeFile(workbook, "DataSheet.xlsx");
+    setEnabled(true);
   };
-
-  // const { data, error, isLoading } = useSWR(
-  //   `/api/sarwa/${insuranceOrLife}/${category}`,
-  //   fetcher,
-  //   {
-  //     refreshInterval: 100,
-  //   }
-  // );
 
   return (
     <Box>
-      <DialogBox
-        openDialog={openDialog}
-        handleCloseAgree={handleCloseAgree}
-        handleCloseDisagree={() => {
-          setOpenDialog(false);
-        }}
-        setAlert={setAlert}
-      ></DialogBox>
-      <AddModal
-        openAdd={openAdd}
-        setOpenAdd={setOpenAdd}
-        endPoint="teams"
-      ></AddModal>
-      <EditModal
-        openEdit={openEdit}
-        setOpenEdit={setOpenEdit}
-        endPoint="teams"
-        currentId={currentId}
-      ></EditModal>
-
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
+          alignItems: "flex-start",
         }}
       >
-        <ContentTitle></ContentTitle>
-        {alert && <TimingAlert></TimingAlert>}
+        <ContentTitle />
+        <DatePickerCustom
+          dateFrom={dateFrom}
+          setDateFrom={setDateFrom}
+          dateTo={dateTo}
+          setDateTo={setDateTo}
+        />
+        <SearchInput searchText={searchText} setSearchText={setSearchText} />
+        <PaginationIcons
+          page={page}
+          setPage={setPage}
+          paginatedData={paginatedData}
+        ></PaginationIcons>
+
+        <Button
+          variant="contained"
+          sx={{ fontWeight: "bold", height: "35px" }}
+          onClick={downloadExcel}
+        >
+          {enabled ? (
+            "Export"
+          ) : (
+            <CircularProgress size={20} sx={{ color: "white" }} />
+          )}
+        </Button>
       </Box>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell sx={{ width: 150 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    // wordSpacing: "200px",
-                  }}
-                >
-                  Phone
-                </Box>
-              </StyledTableCell>
-              <StyledTableCell sx={{ width: 250 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    // wordSpacing: "200px",
-                  }}
-                >
-                  National Id
-                </Box>
-              </StyledTableCell>
-              <StyledTableCell sx={{ width: 250 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    // wordSpacing: "200px",
-                  }}
-                >
-                  User Limit
-                </Box>
-              </StyledTableCell>
-              <StyledTableCell sx={{ width: 250 }}>
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    // wordSpacing: "200px",
-                  }}
-                >
-                  Gender
-                </Box>
-              </StyledTableCell>
-            </TableRow>
-          </TableHead>
+          <TableHeader
+            cells={["Phone", "National Id", "User Limit", "Gender"]}
+          />
           <TableBody>
-            {/* {isLoading ? ( */}
-            {false ? (
+            {isLoading ? (
               <StyledTableRow>
                 <StyledTableCell component="th" scope="row" colSpan={8}>
                   <Box
@@ -170,25 +112,13 @@ export default function ContentTable() {
                   </Box>
                 </StyledTableCell>
               </StyledTableRow>
-            ) : // ) : data.length ? (
-            true ? (
-              // data.map((member, index) => (
-              <StyledTableRow key={""}>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {"201023230900"}
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {"28602220104929"}
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {"21100"}
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {"ذكر"}
-                </StyledTableCell>
-              </StyledTableRow>
+            ) : paginatedData?.data?.length ? (
+              <>
+                {paginatedData.data.map((item, index) => (
+                  <TableBodyy item={item} index={index} />
+                ))}
+              </>
             ) : (
-              // ))
               <StyledTableRow sx={{}}>
                 <StyledTableCell colSpan={8} sx={{}}>
                   <Box

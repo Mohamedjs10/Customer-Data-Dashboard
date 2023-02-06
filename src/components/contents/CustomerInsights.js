@@ -7,13 +7,13 @@ import Box from "@mui/material/Box";
 import ContentTitle from "../mini/ContentTitle";
 import CircularProgress from "@mui/material/CircularProgress";
 import { StyledTableCell, StyledTableRow } from "./utils/general-utils";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Button from "@mui/material/Button";
 import * as XLSX from "xlsx";
 import DatePickerCustom from "../mini/DatePickerCustom";
 import PaginationIcons from "../mini/PaginationIcons";
 import SearchInput from "../mini/SearchInput";
 import TableHeader from "../mini/TableHeader";
+import TableBodyy from "../mini/TableBodyy";
 export default function ContentTable() {
   // expoted date => data is paginated, so data.meta isn't null
   //paginated date => data is not,instead, served fully, so data.meta is null
@@ -121,42 +121,7 @@ export default function ContentTable() {
             ) : paginatedData?.data?.length ? (
               <>
                 {paginatedData.data.map((item, index) => (
-                  <StyledTableRow key={index}>
-                    <StyledTableCell component="th" scope="row" align="center">
-                      {item.phone}
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row" align="center">
-                      {item.national_id}
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row" align="center">
-                      {item.location[0] && (
-                        <>
-                          <Box>
-                            <a
-                              target="_blank"
-                              href={`https://maps.google.com/?q=${
-                                item.location[item.location.length - 1]
-                                  ?.latitude
-                              },${
-                                item.location[item.location.length - 1]
-                                  ?.longitude
-                              }`}
-                            >
-                              <LocationOnIcon
-                                sx={{ fontSize: 30, color: "red" }}
-                              />
-                            </a>
-                          </Box>
-                        </>
-                      )}
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row" align="center">
-                      {new Date(item.created_at).toLocaleString()}
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row" align="center">
-                      {item.device_model}
-                    </StyledTableCell>
-                  </StyledTableRow>
+                  <TableBodyy item={item} index={index} />
                 ))}
               </>
             ) : (
