@@ -83,6 +83,9 @@ export default function TableBodyy({ item, index }) {
           <StyledTableCell component="th" scope="row" align="center">
             {item.gender}
           </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.created_at}
+          </StyledTableCell>
         </StyledTableRow>
       </>
     );
@@ -101,6 +104,9 @@ export default function TableBodyy({ item, index }) {
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
             {item.gender}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.created_at}
           </StyledTableCell>
         </StyledTableRow>
       </>
@@ -133,12 +139,46 @@ export default function TableBodyy({ item, index }) {
         </StyledTableRow>
       </>
     );
-  } else if (tab === "Customer Data") {
+  } else if (tab === "New Users") {
     return (
       <>
         <StyledTableRow key={index}>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.new_users}
+            {item.phone}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.national_id}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.device_model ? item.device_model : "-"}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.created_at}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.updated_at}
+          </StyledTableCell>
+        </StyledTableRow>
+      </>
+    );
+  } else if (tab === "Active Users") {
+    return (
+      <>
+        <StyledTableRow key={index}>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.phone}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.national_id}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.device_model ? item.device_model : "-"}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.created_at}
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row" align="center">
+            {item.updated_at}
           </StyledTableCell>
         </StyledTableRow>
       </>

@@ -2,7 +2,7 @@ import { createSlice, configureStore } from "@reduxjs/toolkit";
 
 const tabSlice = createSlice({
   name: "tab",
-  initialState: { tab: "Customer Data" },
+  initialState: { tab: "New Users" },
   reducers: {
     update(state, action) {
       state.tab = action.payload;

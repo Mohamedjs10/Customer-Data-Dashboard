@@ -95,7 +95,13 @@ export default function ContentTable() {
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHeader
-            cells={["Phone", "National Id", "User Limit", "Gender"]}
+            cells={[
+              "Phone",
+              "National Id",
+              "User Limit",
+              "Gender",
+              "Created At",
+            ]}
           />
           <TableBody>
             {isLoading ? (

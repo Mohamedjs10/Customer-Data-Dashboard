@@ -25,9 +25,14 @@ export default function Navigator(props) {
     {
       children: [
         {
-          id: "Customer Data",
+          id: "New Users",
           icon: <PeopleIcon />,
-          active: tab == "Customer Data" ? true : false,
+          active: tab == "New Users" ? true : false,
+        },
+        {
+          id: "Active Users",
+          icon: <PeopleIcon />,
+          active: tab == "Active Users" ? true : false,
         },
         {
           id: "Bill Payment User",
@@ -85,7 +90,7 @@ export default function Navigator(props) {
             textAlign: "center",
           }}
         >
-          Customer Data Dashboard
+          New Users Dashboard
         </ListItem>
 
         {categories.map(({ id, children }) => (

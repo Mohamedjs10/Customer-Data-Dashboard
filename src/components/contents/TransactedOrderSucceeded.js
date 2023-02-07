@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
@@ -14,36 +15,70 @@ import PaginationIcons from "../mini/PaginationIcons";
 import SearchInput from "../mini/SearchInput";
 import TableHeader from "../mini/TableHeader";
 import TableBodyy from "../mini/TableBodyy";
+import SelectInput from "../mini/SelectInput";
+import InsightsCard from "../mini/InsightsCard";
+import TakeInput from "../mini/TakeInput";
+// const insights = [
+//   { name: "name", count: 100 },
+//   { name: "name", count: 200 },
+//   { name: "name", count: 310 },
+// ];
 export default function ContentTable() {
   // expoted date => data is paginated, so data.meta isn't null
   //paginated date => data is not,instead, served fully, so data.meta is null
+  const [selected, setSelected] = React.useState("");
   const [page, setPage] = React.useState(1);
+  // const [take, setTake] = React.useState(100);
+  const [take, setTake] = React.useState("");
   const [enabled, setEnabled] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
   const [dateFrom, setDateFrom] = React.useState(null);
   const [dateTo, setDateTo] = React.useState(null);
   const [paginatedData, setPaginatedData] = React.useState([]);
-  console.log(paginatedData);
   const [searchText, setSearchText] = React.useState("");
+  const [insights, setInsights] = React.useState([]);
   // handle api query based on date
   const url =
     dateFrom && dateTo
-      ? `https://api-mobile.contact.eg/report/users/transactions?status=succeeded&from=${dateFrom}&to=${dateTo}&`
+      ? `https://api-mobile.contact.eg/report/users/transactions?from=${dateFrom}&to=${dateTo}&`
       : dateFrom
-      ? `https://api-mobile.contact.eg/report/users/transactions?status=succeeded&from=${dateFrom}&`
+      ? `https://api-mobile.contact.eg/report/users/transactions?from=${dateFrom}&`
       : dateTo
-      ? `https://api-mobile.contact.eg/report/users/transactions?status=succeeded&to=${dateTo}&`
-      : `https://api-mobile.contact.eg/report/users/transactions?status=succeeded&`;
+      ? `https://api-mobile.contact.eg/report/users/transactions?to=${dateTo}&`
+      : `https://api-mobile.contact.eg/report/users/transactions?`;
+
+  // https://api-mobile.contact.eg/report/users/transactions/insights
 
   React.useEffect(() => {
     setIsLoading(true);
-    fetch(`${url}page=${page}&take=100`)
+
+    fetch(`https://api-mobile.contact.eg/report/users/transactions/insights`)
       .then((response) => response.json())
       .then((response) => {
-        setPaginatedData(response);
-        setIsLoading(false);
+        setInsights(response);
+        // console.log();
       });
-  }, [page, dateFrom, dateTo]);
+
+    if (selected && selected !== "all") {
+      fetch(
+        `${url}page=${page}&take=${
+          take > 0 && take != "" ? take : 100
+        }&${`&status=${selected}`}`
+      )
+        .then((response) => response.json())
+        .then((response) => {
+          setPaginatedData(response);
+          setIsLoading(false);
+        });
+    } else {
+      fetch(`${url}page=${page}&take=${take > 0 && take != "" ? take : 100}`)
+        .then((response) => response.json())
+        .then((response) => {
+          setPaginatedData(response);
+          setIsLoading(false);
+        });
+    }
+  }, [take, page, dateFrom, dateTo, selected]);
   const downloadExcel = async () => {
     setEnabled(false);
     const exportedData = await fetch(`${url}export_=true`).then((response) =>
@@ -79,7 +114,12 @@ export default function ContentTable() {
           setPage={setPage}
           paginatedData={paginatedData}
         ></PaginationIcons>
-
+        <TakeInput take={take} setTake={setTake}></TakeInput>
+        <SelectInput
+          selects={["all", "initiated", "processing", "succeeded", "failed"]}
+          selected={selected}
+          setSelected={setSelected}
+        ></SelectInput>
         <Button
           variant="contained"
           sx={{ fontWeight: "bold", height: "35px" }}
@@ -91,6 +131,9 @@ export default function ContentTable() {
             <CircularProgress size={20} sx={{ color: "white" }} />
           )}
         </Button>
+      </Box>
+      <Box>
+        <InsightsCard insights={insights.data}></InsightsCard>
       </Box>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">

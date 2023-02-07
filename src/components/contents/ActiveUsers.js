@@ -33,16 +33,16 @@ export default function ContentTable() {
   // handle api query based on date
   const url =
     dateFrom && dateTo
-      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}&to=${dateTo}`
+      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}&to=${dateTo}&`
       : dateFrom
-      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}`
+      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}&`
       : dateTo
-      ? `https://api-mobile.contact.eg/report/users/new?to=${dateTo}`
-      : `https://api-mobile.contact.eg/report/users/new`;
+      ? `https://api-mobile.contact.eg/report/users/new?to=${dateTo}&`
+      : `https://api-mobile.contact.eg/report/users/new?`;
 
   React.useEffect(() => {
     setIsLoading(true);
-    fetch(`${url}`)
+    fetch(`${url}page=${page}&take=100`)
       .then((response) => response.json())
       .then((response) => {
         setPaginatedData(response);
@@ -56,8 +56,7 @@ export default function ContentTable() {
       response.json()
     );
 
-    //!TODO const worksheet = XLSX.utils.json_to_sheet([exportedData.data]);
-    const worksheet = XLSX.utils.json_to_sheet([exportedData]);
+    const worksheet = XLSX.utils.json_to_sheet(exportedData.data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
@@ -102,7 +101,15 @@ export default function ContentTable() {
       </Box>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHeader cells={["New Users"]} />
+          <TableHeader
+            cells={[
+              "Phone",
+              "National Id",
+              "Device Model",
+              "Created At",
+              "Updated At",
+            ]}
+          />
           <TableBody>
             {isLoading ? (
               <StyledTableRow>
@@ -120,8 +127,7 @@ export default function ContentTable() {
               </StyledTableRow>
             ) : paginatedData ? (
               <>
-                {/*TODO {paginatedData?.map((item, index) => (       .....    the only one come back with object instead of array*/}
-                {[paginatedData]?.map((item, index) => (
+                {paginatedData.data?.map((item, index) => (
                   <TableBodyy item={item} index={index} />
                 ))}
               </>

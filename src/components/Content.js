@@ -1,5 +1,6 @@
 import * as React from "react";
-import CustomerData from "./contents/CustomerData";
+import NewUsers from "./contents/NewUsers";
+import ActiveUsers from "./contents/ActiveUsers";
 import BillPaymentUser from "./contents/BillPaymentUser";
 import CustomerInsights from "./contents/CustomerInsights";
 import TransactedOrderSucceeded from "./contents/TransactedOrderSucceeded";
@@ -8,8 +9,10 @@ import IapprovalWithoutLimit from "./contents/IapprovalWithoutLimit";
 import { useSelector } from "react-redux";
 export default function Content() {
   const tab = useSelector((state) => state.tab.tab);
-  return tab == "Customer Data" ? (
-    <CustomerData></CustomerData>
+  return tab == "New Users" ? (
+    <NewUsers></NewUsers>
+  ) : tab == "Active Users" ? (
+    <ActiveUsers></ActiveUsers>
   ) : tab == "Bill Payment User" ? (
     <BillPaymentUser></BillPaymentUser>
   ) : tab == "Customer Insights" ? (

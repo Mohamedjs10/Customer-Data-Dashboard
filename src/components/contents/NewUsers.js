@@ -1,39 +1,44 @@
 import * as React from "react";
+import TableHeader from "../mini/TableHeader";
+import TableBodyy from "../mini/TableBodyy";
+
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
+
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import ContentTitle from "../mini/ContentTitle";
 import CircularProgress from "@mui/material/CircularProgress";
 import { StyledTableCell, StyledTableRow } from "./utils/general-utils";
+
 import Button from "@mui/material/Button";
 import * as XLSX from "xlsx";
 import DatePickerCustom from "../mini/DatePickerCustom";
 import PaginationIcons from "../mini/PaginationIcons";
 import SearchInput from "../mini/SearchInput";
-import TableHeader from "../mini/TableHeader";
-import TableBodyy from "../mini/TableBodyy";
+
 export default function ContentTable() {
   // expoted date => data is paginated, so data.meta isn't null
   //paginated date => data is not,instead, served fully, so data.meta is null
   const [page, setPage] = React.useState(1);
   const [enabled, setEnabled] = React.useState(true);
-  const [isLoading, setIsLoading] = React.useState(false);
   const [dateFrom, setDateFrom] = React.useState(null);
   const [dateTo, setDateTo] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const [paginatedData, setPaginatedData] = React.useState([]);
-  console.log(paginatedData);
+  console.log([paginatedData]);
   const [searchText, setSearchText] = React.useState("");
   // handle api query based on date
   const url =
     dateFrom && dateTo
-      ? `https://api-mobile.contact.eg/report/instant-approval?from=${dateFrom}&to=${dateTo}&`
+      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}&to=${dateTo}&`
       : dateFrom
-      ? `https://api-mobile.contact.eg/report/instant-approval?from=${dateFrom}&`
+      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}&`
       : dateTo
-      ? `https://api-mobile.contact.eg/report/instant-approval?to=${dateTo}&`
-      : `https://api-mobile.contact.eg/report/instant-approval?`;
+      ? `https://api-mobile.contact.eg/report/users/new?to=${dateTo}&`
+      : `https://api-mobile.contact.eg/report/users/new?`;
 
   React.useEffect(() => {
     setIsLoading(true);
@@ -44,11 +49,13 @@ export default function ContentTable() {
         setIsLoading(false);
       });
   }, [page, dateFrom, dateTo]);
+
   const downloadExcel = async () => {
     setEnabled(false);
-    const exportedData = await fetch(`${url}export_=true`).then((response) =>
+    const exportedData = await fetch(`${url}`).then((response) =>
       response.json()
     );
+
     const worksheet = XLSX.utils.json_to_sheet(exportedData.data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -98,9 +105,9 @@ export default function ContentTable() {
             cells={[
               "Phone",
               "National Id",
-              "User Limit",
-              "Gender",
+              "Device Model",
               "Created At",
+              "Updated At",
             ]}
           />
           <TableBody>
@@ -118,13 +125,14 @@ export default function ContentTable() {
                   </Box>
                 </StyledTableCell>
               </StyledTableRow>
-            ) : paginatedData?.data?.length ? (
+            ) : paginatedData ? (
               <>
-                {paginatedData.data.map((item, index) => (
+                {paginatedData.data?.map((item, index) => (
                   <TableBodyy item={item} index={index} />
                 ))}
               </>
             ) : (
+              // ))
               <StyledTableRow sx={{}}>
                 <StyledTableCell colSpan={8} sx={{}}>
                   <Box
