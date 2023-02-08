@@ -11,7 +11,9 @@ export const billPaymentReport = async (oldReqBody) => {
     const { signature, body } = await generateSignatureAndBody(oldReqBody);
 
     const res = await axios.post(
-      `https://contactpay-api-iframe.contact.eg/bill-payment/report`,
+      // `https://contactpay-api-iframe.contact.eg/bill-payment/report`,
+      "http://192.168.42.49:5000/bill-payment/report",
+
       body,
       {
         auth: auth,

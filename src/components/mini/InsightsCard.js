@@ -3,15 +3,16 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
-
+import { textFixer } from "../contents/utils/general-utils";
 export default function InsightsCard({ insights }) {
   return (
     <Box
       sx={{
         display: "flex",
-        gap: 5,
-        mt: 2,
-        mb: 2,
+        justifyContent: "flex-start",
+        gap: 3,
+        mt: 3,
+        mb: 5,
       }}
     >
       {insights?.map((item, index) => (
@@ -24,15 +25,22 @@ export default function InsightsCard({ insights }) {
         >
           <CardContent
             sx={{
-              height: 150,
+              height: 180,
               display: "flex",
               alignItems: "center",
               flexDirection: "column",
               justifyContent: "space-between",
             }}
           >
-            <Typography sx={{ fontWeight: "bold", fontSize: 20 }}>
-              {item.name}
+            <Typography
+              sx={{
+                fontWeight: "bold",
+                fontSize: 20,
+                color: "#5b6470",
+                textAlign: "center",
+              }}
+            >
+              {textFixer(item.name)}
             </Typography>
 
             <Typography

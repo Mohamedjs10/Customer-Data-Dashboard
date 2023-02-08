@@ -20,45 +20,49 @@ import { tabActions } from "../components/store/store";
 export default function Navigator(props) {
   const dispatch = useDispatch();
   const tab = useSelector((state) => state.tab.tab);
+  console.log(tab);
   const { ...other } = props;
   const categories = [
     {
       children: [
         {
-          id: "New Users",
+          id: "Users",
           icon: <PeopleIcon />,
-          active: tab == "New Users" ? true : false,
+          active: tab == "New Users" || tab == "Active Users" ? true : false,
         },
-        {
-          id: "Active Users",
-          icon: <PeopleIcon />,
-          active: tab == "Active Users" ? true : false,
-        },
+        // {
+        //   id: "Active Users",
+        //   icon: <PeopleIcon />,
+        //   active: tab == "Active Users" ? true : false,
+        // },
         {
           id: "Bill Payment User",
           icon: <ReceiptLongIcon />,
           active: tab == "Bill Payment User" ? true : false,
         },
+        // {
+        //   id: "Customer Insights",
+        //   icon: <InsightsIcon />,
+        //   active: tab == "Customer Insights" ? true : false,
+        // },
         {
-          id: "Customer Insights",
-          icon: <InsightsIcon />,
-          active: tab == "Customer Insights" ? true : false,
-        },
-        {
-          id: "Transacted Order Succeeded",
+          id: "Transacted Orders",
           icon: <CheckCircleIcon />,
-          active: tab == "Transacted Order Succeeded" ? true : false,
+          active: tab == "Transacted Orders" ? true : false,
         },
         {
-          id: "Iapproval With Limit",
+          id: "Instant Approval",
           icon: <HowToRegIcon />,
-          active: tab == "Iapproval With Limit" ? true : false,
+          active:
+            tab == "Iapproval With Limit" || tab == "Iapproval Without Limit"
+              ? true
+              : false,
         },
-        {
-          id: "Iapproval Without Limit",
-          icon: <HowToRegIcon />,
-          active: tab == "Iapproval Without Limit" ? true : false,
-        },
+        // {
+        //   id: "Iapproval Without Limit",
+        //   icon: <HowToRegIcon />,
+        //   active: tab == "Iapproval Without Limit" ? true : false,
+        // },
       ],
     },
   ];
@@ -88,9 +92,11 @@ export default function Navigator(props) {
             fontSize: 22,
             color: "#fff",
             textAlign: "center",
+            pt: 3.5,
+            pb: 3.5,
           }}
         >
-          New Users Dashboard
+          Users Dashboard
         </ListItem>
 
         {categories.map(({ id, children }) => (
@@ -103,7 +109,13 @@ export default function Navigator(props) {
                 disablePadding
                 key={childId}
                 onClick={() => {
-                  dispatch(tabActions.update(childId));
+                  if (childId === "Users") {
+                    dispatch(tabActions.update("New Users"));
+                  } else if (childId === "Instant Approval") {
+                    dispatch(tabActions.update("Iapproval With Limit"));
+                  } else if (childId) {
+                    dispatch(tabActions.update(childId));
+                  }
                 }}
               >
                 <ListItemButton selected={active} sx={item}>

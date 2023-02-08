@@ -10,7 +10,7 @@ export default function PaginationIcons({ page, setPage, paginatedData }) {
   return (
     <Box
       sx={{
-        ml: 10,
+        // ml: 10,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

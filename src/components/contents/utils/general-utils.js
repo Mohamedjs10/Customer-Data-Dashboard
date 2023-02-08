@@ -42,3 +42,11 @@ export function pad(num) {
   if (num.length < 2) num = "0" + num;
   return num;
 }
+
+export const textFixer = (text) => {
+  let modifietextWithoutUnderscore = text.replaceAll("_", " ");
+  let capitalizedText =
+    modifietextWithoutUnderscore.charAt(0).toUpperCase() +
+    modifietextWithoutUnderscore.slice(1);
+  return capitalizedText;
+};

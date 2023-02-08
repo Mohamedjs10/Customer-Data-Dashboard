@@ -3,7 +3,7 @@ import NewUsers from "./contents/NewUsers";
 import ActiveUsers from "./contents/ActiveUsers";
 import BillPaymentUser from "./contents/BillPaymentUser";
 import CustomerInsights from "./contents/CustomerInsights";
-import TransactedOrderSucceeded from "./contents/TransactedOrderSucceeded";
+import TransactedOrders from "./contents/TransactedOrders";
 import IapprovalWithLimit from "./contents/IapprovalWithLimit";
 import IapprovalWithoutLimit from "./contents/IapprovalWithoutLimit";
 import { useSelector } from "react-redux";
@@ -17,8 +17,8 @@ export default function Content() {
     <BillPaymentUser></BillPaymentUser>
   ) : tab == "Customer Insights" ? (
     <CustomerInsights></CustomerInsights>
-  ) : tab == "Transacted Order Succeeded" ? (
-    <TransactedOrderSucceeded></TransactedOrderSucceeded>
+  ) : tab == "Transacted Orders" ? (
+    <TransactedOrders></TransactedOrders>
   ) : tab == "Iapproval With Limit" ? (
     <IapprovalWithLimit></IapprovalWithLimit>
   ) : tab == "Iapproval Without Limit" ? (

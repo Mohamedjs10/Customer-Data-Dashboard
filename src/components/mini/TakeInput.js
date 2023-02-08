@@ -2,14 +2,8 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 export default function TakeInput({ take, setTake }) {
-  // const handleChange = (event) => {
-  //   console.log(event.target.value);
-  //   if (true) {
-  //     setTake(event.target.value);
-  //   }
-  // };
   const handleChange = (e) => {
-    const regex = /^[1-9\b]+$/;
+    const regex = /^[1-9][0-9]*$/;
     if (e.target.value === "" || regex.test(e.target.value)) {
       setTake(e.target.value);
     }

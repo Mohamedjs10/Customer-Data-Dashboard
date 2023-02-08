@@ -14,12 +14,13 @@ import PaginationIcons from "../mini/PaginationIcons";
 import SearchInput from "../mini/SearchInput";
 import TableHeader from "../mini/TableHeader";
 import TableBodyy from "../mini/TableBodyy";
+import TakeInput from "../mini/TakeInput";
 
 import dayjs from "dayjs";
 import { billPaymentReport } from "../../encryption/apiCalls";
 export default function ContentTable() {
-  // expoted date => data is paginated, so data.meta isn't null
-  //paginated date => data is not,instead, served fully, so data.meta is null
+  const [take, setTake] = React.useState("");
+
   const [page, setPage] = React.useState(1);
   const [enabled, setEnabled] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -30,34 +31,21 @@ export default function ContentTable() {
   const [paginatedData, setPaginatedData] = React.useState([]);
   console.log(paginatedData);
   const [searchText, setSearchText] = React.useState("");
-  // const start = "2022-01-01";
-  // const end = dayjs(Date.now()).format("YYYY-MM-DD");
-  // handle api query based on date
 
   React.useEffect(() => {
     setIsLoading(true);
-    // fetch(`${url}page=${page}&take=100`)
-    //   .then((response) => response.json())
-    //   .then((response) => {
-    //     setPaginatedData(response);
-    //     setIsLoading(false);
-    //   });
-    billPaymentReport({ start_date: dateFrom, end_date: dateTo })
-      // .then((response) => response.json())
-      .then((response) => {
-        setPaginatedData(response);
-        setIsLoading(false);
-      });
+
+    billPaymentReport({ from: dateFrom, to: dateTo }).then((response) => {
+      setPaginatedData(response);
+      setIsLoading(false);
+    });
   }, [page, dateFrom, dateTo]);
   const downloadExcel = async () => {
     setEnabled(false);
-    // const exportedData = await fetch(`${url}export_=true`).then((response) =>
-    //   response.json()
-    // );
 
     const exportedData = await billPaymentReport({
-      start_date: dateFrom,
-      end_date: dateTo,
+      to: dateFrom,
+      from: dateTo,
     });
 
     const worksheet = XLSX.utils.json_to_sheet(exportedData.data);
@@ -70,6 +58,7 @@ export default function ContentTable() {
 
   return (
     <Box>
+      <ContentTitle />
       <Box
         sx={{
           display: "flex",
@@ -77,19 +66,20 @@ export default function ContentTable() {
           alignItems: "flex-start",
         }}
       >
-        <ContentTitle />
         <DatePickerCustom
           dateFrom={dateFrom}
           setDateFrom={setDateFrom}
           dateTo={dateTo}
           setDateTo={setDateTo}
         />
+
         <SearchInput searchText={searchText} setSearchText={setSearchText} />
         <PaginationIcons
           page={page}
           setPage={setPage}
           paginatedData={paginatedData}
         ></PaginationIcons>
+        <TakeInput take={take} setTake={setTake}></TakeInput>
 
         <Button
           variant="contained"

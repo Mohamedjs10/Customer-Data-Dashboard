@@ -59,6 +59,8 @@ export default function ContentTable() {
 
   return (
     <Box>
+      <ContentTitle />
+
       <Box
         sx={{
           display: "flex",
@@ -66,7 +68,6 @@ export default function ContentTable() {
           alignItems: "flex-start",
         }}
       >
-        <ContentTitle />
         <DatePickerCustom
           dateFrom={dateFrom}
           setDateFrom={setDateFrom}

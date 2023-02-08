@@ -11,12 +11,15 @@ import Box from "@mui/material/Box";
 import ContentTitle from "../mini/ContentTitle";
 import CircularProgress from "@mui/material/CircularProgress";
 import { StyledTableCell, StyledTableRow } from "./utils/general-utils";
+import InsightsCard from "../mini/InsightsCard";
 
 import Button from "@mui/material/Button";
 import * as XLSX from "xlsx";
 import DatePickerCustom from "../mini/DatePickerCustom";
 import PaginationIcons from "../mini/PaginationIcons";
 import SearchInput from "../mini/SearchInput";
+import SelectSubcategory from "../mini/SelectSubcategory";
+import TakeInput from "../mini/TakeInput";
 
 export default function ContentTable() {
   // expoted date => data is paginated, so data.meta isn't null
@@ -30,42 +33,103 @@ export default function ContentTable() {
   const [paginatedData, setPaginatedData] = React.useState([]);
   console.log([paginatedData]);
   const [searchText, setSearchText] = React.useState("");
-  // handle api query based on date
-  const url =
+
+  const [take, setTake] = React.useState("");
+  const [insights, setInsights] = React.useState([]);
+  console.log(insights);
+  console.log([paginatedData]);
+
+  const dateParams =
     dateFrom && dateTo
-      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}&to=${dateTo}&`
+      ? `from=${dateFrom}&to=${dateTo}`
       : dateFrom
-      ? `https://api-mobile.contact.eg/report/users/new?from=${dateFrom}&`
+      ? `from=${dateFrom}`
       : dateTo
-      ? `https://api-mobile.contact.eg/report/users/new?to=${dateTo}&`
-      : `https://api-mobile.contact.eg/report/users/new?`;
+      ? `to=${dateTo}`
+      : ``;
+  const url = `https://api-mobile.contact.eg/report/users/active?${dateParams}`;
 
   React.useEffect(() => {
     setIsLoading(true);
-    fetch(`${url}page=${page}&take=100`)
+
+    fetch(`https://api-mobile.contact.eg/report/users/insights?${dateParams}`)
+      .then((response) => response.json())
+      .then((response) => {
+        setInsights(response);
+      });
+
+    // if (selected && selected !== "all") {
+    //   fetch(
+    //     `${url}&page=${page}&take=${
+    //       take > 0 && take != "" ? take : 100
+    //     }${`&status=${selected}`}`
+    //   )
+    //     .then((response) => response.json())
+    //     .then((response) => {
+    //       setPaginatedData(response);
+    //       setIsLoading(false);
+    //     });
+    // } else {
+    fetch(`${url}&page=${page}&take=${take > 0 && take != "" ? take : 100}`)
       .then((response) => response.json())
       .then((response) => {
         setPaginatedData(response);
         setIsLoading(false);
       });
-  }, [page, dateFrom, dateTo]);
-
+    // }
+  }, [take, page, dateFrom, dateTo]);
   const downloadExcel = async () => {
     setEnabled(false);
-    const exportedData = await fetch(`${url}`).then((response) =>
+    const exportedData = await fetch(`${url}&export_=true`).then((response) =>
       response.json()
     );
-
     const worksheet = XLSX.utils.json_to_sheet(exportedData.data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-    XLSX.writeFile(workbook, "DataSheet.xlsx");
+    XLSX.writeFile(workbook, "active-users.xlsx");
     setEnabled(true);
   };
 
+  // const url =
+  //   dateFrom && dateTo
+  //     ? `https://api-mobile.contact.eg/report/users/active?from=${dateFrom}&to=${dateTo}&`
+  //     : dateFrom
+  //     ? `https://api-mobile.contact.eg/report/users/active?from=${dateFrom}&`
+  //     : dateTo
+  //     ? `https://api-mobile.contact.eg/report/users/active?to=${dateTo}&`
+  //     : `https://api-mobile.contact.eg/report/users/active?`;
+
+  // React.useEffect(() => {
+  //   setIsLoading(true);
+  //   fetch(`${url}page=${page}&take=100`)
+  //     .then((response) => response.json())
+  //     .then((response) => {
+  //       setPaginatedData(response);
+  //       setIsLoading(false);
+  //     });
+  // }, [page, dateFrom, dateTo]);
+
+  // const downloadExcel = async () => {
+  //   setEnabled(false);
+  //   const exportedData = await fetch(`${url}`).then((response) =>
+  //     response.json()
+  //   );
+
+  //   const worksheet = XLSX.utils.json_to_sheet(exportedData.data);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+  //   XLSX.writeFile(workbook, "DataSheet.xlsx");
+  //   setEnabled(true);
+  // };
+
   return (
     <Box>
+      <ContentTitle />
+      <Box>
+        <InsightsCard insights={insights.data}></InsightsCard>
+      </Box>
       <Box
         sx={{
           display: "flex",
@@ -73,7 +137,6 @@ export default function ContentTable() {
           alignItems: "flex-start",
         }}
       >
-        <ContentTitle />
         <DatePickerCustom
           dateFrom={dateFrom}
           setDateFrom={setDateFrom}
@@ -86,7 +149,8 @@ export default function ContentTable() {
           setPage={setPage}
           paginatedData={paginatedData}
         ></PaginationIcons>
-
+        <SelectSubcategory sub1={"New Users"} sub2={"Active Users"} />
+        <TakeInput take={take} setTake={setTake}></TakeInput>
         <Button
           variant="contained"
           sx={{ fontWeight: "bold", height: "35px" }}
@@ -99,6 +163,7 @@ export default function ContentTable() {
           )}
         </Button>
       </Box>
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHeader

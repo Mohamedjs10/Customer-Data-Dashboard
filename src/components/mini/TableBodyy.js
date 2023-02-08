@@ -51,7 +51,7 @@ export default function TableBodyy({ item, index }) {
         </StyledTableRow>
       </>
     );
-  } else if (tab === "Transacted Order Succeeded") {
+  } else if (tab === "Transacted Orders") {
     return (
       <>
         <StyledTableRow key={index}>
@@ -62,7 +62,8 @@ export default function TableBodyy({ item, index }) {
             {item.phone}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.national_id}
+            {item.national_id ? item.national_id : "-"}
+            {/* {item.national_id} */}
           </StyledTableCell>
         </StyledTableRow>
       </>
@@ -84,7 +85,8 @@ export default function TableBodyy({ item, index }) {
             {item.gender}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.created_at}
+            {new Date(item.created_at).toLocaleString()}
+            {/* {item.created_at} */}
           </StyledTableCell>
         </StyledTableRow>
       </>
@@ -106,7 +108,8 @@ export default function TableBodyy({ item, index }) {
             {item.gender}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.created_at}
+            {new Date(item.created_at).toLocaleString()}
+            {/* {item.created_at} */}
           </StyledTableCell>
         </StyledTableRow>
       </>
@@ -147,16 +150,20 @@ export default function TableBodyy({ item, index }) {
             {item.phone}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.national_id}
+            {item.national_id ? item.national_id : "-"}
+            {/* {item.national_id} */}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
             {item.device_model ? item.device_model : "-"}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.created_at}
+            {new Date(item.created_at).toLocaleString()}
+            {/* {item.created_at} */}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.updated_at}
+            {new Date(item.updated_at).toLocaleString()}
+
+            {/* {item.updated_at} */}
           </StyledTableCell>
         </StyledTableRow>
       </>
@@ -169,16 +176,19 @@ export default function TableBodyy({ item, index }) {
             {item.phone}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.national_id}
+            {item.national_id ? item.national_id : "-"}
+            {/* {item.national_id} */}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
             {item.device_model ? item.device_model : "-"}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.created_at}
+            {new Date(item.created_at).toLocaleString()}
+            {/* {item.created_at} */}
           </StyledTableCell>
           <StyledTableCell component="th" scope="row" align="center">
-            {item.updated_at}
+            {new Date(item.updated_at).toLocaleString()}
+            {/* {item.updated_at} */}
           </StyledTableCell>
         </StyledTableRow>
       </>

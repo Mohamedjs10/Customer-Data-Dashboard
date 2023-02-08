@@ -18,14 +18,8 @@ import TableBodyy from "../mini/TableBodyy";
 import SelectInput from "../mini/SelectInput";
 import InsightsCard from "../mini/InsightsCard";
 import TakeInput from "../mini/TakeInput";
-// const insights = [
-//   { name: "name", count: 100 },
-//   { name: "name", count: 200 },
-//   { name: "name", count: 310 },
-// ];
+
 export default function ContentTable() {
-  // expoted date => data is paginated, so data.meta isn't null
-  //paginated date => data is not,instead, served fully, so data.meta is null
   const [selected, setSelected] = React.useState("");
   const [page, setPage] = React.useState(1);
   // const [take, setTake] = React.useState(100);
@@ -37,33 +31,33 @@ export default function ContentTable() {
   const [paginatedData, setPaginatedData] = React.useState([]);
   const [searchText, setSearchText] = React.useState("");
   const [insights, setInsights] = React.useState([]);
-  // handle api query based on date
-  const url =
-    dateFrom && dateTo
-      ? `https://api-mobile.contact.eg/report/users/transactions?from=${dateFrom}&to=${dateTo}&`
-      : dateFrom
-      ? `https://api-mobile.contact.eg/report/users/transactions?from=${dateFrom}&`
-      : dateTo
-      ? `https://api-mobile.contact.eg/report/users/transactions?to=${dateTo}&`
-      : `https://api-mobile.contact.eg/report/users/transactions?`;
 
-  // https://api-mobile.contact.eg/report/users/transactions/insights
+  const dateParams =
+    dateFrom && dateTo
+      ? `from=${dateFrom}&to=${dateTo}`
+      : dateFrom
+      ? `from=${dateFrom}`
+      : dateTo
+      ? `to=${dateTo}`
+      : ``;
+  const url = `https://api-mobile.contact.eg/report/users/transactions?${dateParams}`;
 
   React.useEffect(() => {
     setIsLoading(true);
 
-    fetch(`https://api-mobile.contact.eg/report/users/transactions/insights`)
+    fetch(
+      `https://api-mobile.contact.eg/report/users/transactions/insights?${dateParams}`
+    )
       .then((response) => response.json())
       .then((response) => {
         setInsights(response);
-        // console.log();
       });
 
     if (selected && selected !== "all") {
       fetch(
-        `${url}page=${page}&take=${
+        `${url}&page=${page}&take=${
           take > 0 && take != "" ? take : 100
-        }&${`&status=${selected}`}`
+        }${`&status=${selected}`}`
       )
         .then((response) => response.json())
         .then((response) => {
@@ -71,7 +65,7 @@ export default function ContentTable() {
           setIsLoading(false);
         });
     } else {
-      fetch(`${url}page=${page}&take=${take > 0 && take != "" ? take : 100}`)
+      fetch(`${url}&page=${page}&take=${take > 0 && take != "" ? take : 100}`)
         .then((response) => response.json())
         .then((response) => {
           setPaginatedData(response);
@@ -94,6 +88,10 @@ export default function ContentTable() {
 
   return (
     <Box>
+      <ContentTitle />
+      <Box>
+        <InsightsCard insights={insights.data}></InsightsCard>
+      </Box>
       <Box
         sx={{
           display: "flex",
@@ -101,13 +99,13 @@ export default function ContentTable() {
           alignItems: "flex-start",
         }}
       >
-        <ContentTitle />
         <DatePickerCustom
           dateFrom={dateFrom}
           setDateFrom={setDateFrom}
           dateTo={dateTo}
           setDateTo={setDateTo}
         />
+
         <SearchInput searchText={searchText} setSearchText={setSearchText} />
         <PaginationIcons
           page={page}
@@ -132,9 +130,7 @@ export default function ContentTable() {
           )}
         </Button>
       </Box>
-      <Box>
-        <InsightsCard insights={insights.data}></InsightsCard>
-      </Box>
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHeader cells={["Status", "Phone", "National Id"]} />

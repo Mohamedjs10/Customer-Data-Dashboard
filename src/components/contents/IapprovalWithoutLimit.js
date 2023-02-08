@@ -14,51 +14,130 @@ import PaginationIcons from "../mini/PaginationIcons";
 import SearchInput from "../mini/SearchInput";
 import TableHeader from "../mini/TableHeader";
 import TableBodyy from "../mini/TableBodyy";
+import SelectSubcategory from "../mini/SelectSubcategory";
+import TakeInput from "../mini/TakeInput";
+import InsightsCard from "../mini/InsightsCard";
 export default function ContentTable() {
-  // expoted date => data is paginated, so data.meta isn't null
-  //paginated date => data is not,instead, served fully, so data.meta is null
   const [page, setPage] = React.useState(1);
   const [enabled, setEnabled] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
   const [dateFrom, setDateFrom] = React.useState(null);
   const [dateTo, setDateTo] = React.useState(null);
   const [paginatedData, setPaginatedData] = React.useState([]);
-  console.log(paginatedData);
+  const [take, setTake] = React.useState("");
+  const [insights, setInsights] = React.useState([]);
   const [searchText, setSearchText] = React.useState("");
-  // handle api query based on date
-  const url =
+
+  const dateParams =
     dateFrom && dateTo
-      ? `https://api-mobile.contact.eg/report/instant-approval?from=${dateFrom}&to=${dateTo}&`
+      ? `from=${dateFrom}&to=${dateTo}`
       : dateFrom
-      ? `https://api-mobile.contact.eg/report/instant-approval?from=${dateFrom}&`
+      ? `from=${dateFrom}`
       : dateTo
-      ? `https://api-mobile.contact.eg/report/instant-approval?to=${dateTo}&`
-      : `https://api-mobile.contact.eg/report/instant-approval?`;
+      ? `to=${dateTo}`
+      : ``;
+  const url = `https://api-mobile.contact.eg/report/instant-approval?${dateParams}`;
 
   React.useEffect(() => {
     setIsLoading(true);
-    fetch(`${url}page=${page}&take=100`)
+
+    fetch(
+      `https://api-mobile.contact.eg/report/instant-approval/insights?${dateParams}`
+    )
+      .then((response) => response.json())
+      .then((response) => {
+        setInsights(response);
+      });
+
+    fetch(`${url}&page=${page}&take=${take > 0 && take != "" ? take : 100}`)
       .then((response) => response.json())
       .then((response) => {
         setPaginatedData(response);
         setIsLoading(false);
       });
-  }, [page, dateFrom, dateTo]);
+    // }
+  }, [take, page, dateFrom, dateTo]);
   const downloadExcel = async () => {
     setEnabled(false);
-    const exportedData = await fetch(`${url}export_=true`).then((response) =>
+    const exportedData = await fetch(`${url}&export_=true`).then((response) =>
       response.json()
     );
     const worksheet = XLSX.utils.json_to_sheet(exportedData.data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-    XLSX.writeFile(workbook, "DataSheet.xlsx");
+    XLSX.writeFile(workbook, "new-users.xlsx");
     setEnabled(true);
   };
 
+  // expoted date => data is paginated, so data.meta isn't null
+  //paginated date => data is not,instead, served fully, so data.meta is null
+  // const [page, setPage] = React.useState(1);
+  // const [enabled, setEnabled] = React.useState(true);
+  // const [isLoading, setIsLoading] = React.useState(false);
+  // const [dateFrom, setDateFrom] = React.useState(null);
+  // const [dateTo, setDateTo] = React.useState(null);
+  // const [paginatedData, setPaginatedData] = React.useState([]);
+  // console.log(paginatedData);
+  // const [searchText, setSearchText] = React.useState("");
+  // // handle api query based on date
+  // const url =
+  //   dateFrom && dateTo
+  //     ? `https://api-mobile.contact.eg/report/instant-approval?from=${dateFrom}&to=${dateTo}&`
+  //     : dateFrom
+  //     ? `https://api-mobile.contact.eg/report/instant-approval?from=${dateFrom}&`
+  //     : dateTo
+  //     ? `https://api-mobile.contact.eg/report/instant-approval?to=${dateTo}&`
+  //     : `https://api-mobile.contact.eg/report/instant-approval?`;
+
+  // React.useEffect(() => {
+  //   setIsLoading(true);
+  //   fetch(`${url}page=${page}&take=100`)
+  //     .then((response) => response.json())
+  //     .then((response) => {
+  //       setPaginatedData(response);
+  //       setIsLoading(false);
+  //     });
+  // }, [page, dateFrom, dateTo]);
+  // const downloadExcel = async () => {
+  //   setEnabled(false);
+  //   const exportedData = await fetch(`${url}export_=true`).then((response) =>
+  //     response.json()
+  //   );
+  //   const worksheet = XLSX.utils.json_to_sheet(exportedData.data);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+  //   XLSX.writeFile(workbook, "DataSheet.xlsx");
+  //   setEnabled(true);
+  // };
+
   return (
     <Box>
+      <ContentTitle />
+      <Box
+        sx={{
+          display: "flex",
+          overflow: "scroll",
+          width: "1150px",
+          mt: 3,
+          mb: 3,
+          pr: 2,
+          pl: 2,
+
+          "&::-webkit-scrollbar": {
+            height: "5px",
+            width: "0px",
+          },
+
+          "::-webkit-scrollbar-thumb": {
+            background: "#0f2941",
+            boxShadow: "0px 0px 10px #9e9fa1",
+          },
+        }}
+      >
+        <InsightsCard insights={insights.data}></InsightsCard>
+      </Box>
       <Box
         sx={{
           display: "flex",
@@ -66,7 +145,6 @@ export default function ContentTable() {
           alignItems: "flex-start",
         }}
       >
-        <ContentTitle />
         <DatePickerCustom
           dateFrom={dateFrom}
           setDateFrom={setDateFrom}
@@ -79,7 +157,11 @@ export default function ContentTable() {
           setPage={setPage}
           paginatedData={paginatedData}
         ></PaginationIcons>
-
+        <SelectSubcategory
+          sub1={"Iapproval With Limit"}
+          sub2={"Iapproval Without Limit"}
+        />
+        <TakeInput take={take} setTake={setTake}></TakeInput>
         <Button
           variant="contained"
           sx={{ fontWeight: "bold", height: "35px" }}
@@ -92,6 +174,7 @@ export default function ContentTable() {
           )}
         </Button>
       </Box>
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHeader

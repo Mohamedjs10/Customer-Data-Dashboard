@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
 export default function DatePickerCustom({
   dateFrom,
   setDateFrom,
@@ -12,7 +13,12 @@ export default function DatePickerCustom({
   setDateTo,
 }) {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      sx={{
+        mr: "auto",
+      }}
+    >
       <Stack
         sx={{
           mb: 3,
@@ -30,10 +36,11 @@ export default function DatePickerCustom({
         />
       </Stack>
       <Stack
-        // spacing={3}
         sx={{
           mb: 3,
+
           width: 150,
+          justifySelf: "start",
         }}
       >
         <DatePicker
